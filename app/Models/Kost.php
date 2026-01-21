@@ -20,6 +20,7 @@ class Kost extends Model
         'price',
         'facilities',
         'images',
+        'is_active',
         'contact_whatsapp',
         'contact_instagram',
         'contact_facebook',
@@ -28,6 +29,7 @@ class Kost extends Model
     protected $casts = [
         'images' => 'array',
         'price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     public function owner()

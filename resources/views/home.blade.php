@@ -53,13 +53,39 @@
             <div class="card kost-card">
                 <div class="position-relative">
                     @if(count($kost->images) > 0)
-                        <img src="{{ asset('storage/' . $kost->images[0]) }}" class="card-img-top" alt="{{ $kost->name }}">
+                        <div id="previewCarousel{{ $kost->id }}" class="carousel slide" data-bs-ride="false">
+                            <div class="carousel-inner">
+                                @foreach($kost->images as $index => $image)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <img src="{{ asset('storage/' . $image) }}" class="card-img-top" alt="{{ $kost->name }}">
+                                </div>
+                                @endforeach
+                            </div>
+                            @if(count($kost->images) > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#previewCarousel{{ $kost->id }}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#previewCarousel{{ $kost->id }}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
+                            <div class="carousel-indicators" style="bottom: 5px;">
+                                @foreach($kost->images as $index => $image)
+                                <button type="button" data-bs-target="#previewCarousel{{ $kost->id }}" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" style="width: 8px; height: 8px; border-radius: 50%;"></button>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
                     @else
                         <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
                             <i class="bi bi-house-door-fill" style="font-size: 3rem;"></i>
                         </div>
                     @endif
                     <span class="badge bg-primary badge-type">{{ $kost->type }}</span>
+                    @if(count($kost->images) > 1)
+                    <span class="badge bg-dark" style="position: absolute; top: 10px; left: 10px;">
+                        <i class="bi bi-images"></i> {{ count($kost->images) }} Foto
+                    </span>
+                    @endif
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ $kost->name }}</h5>

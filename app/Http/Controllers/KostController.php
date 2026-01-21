@@ -116,4 +116,18 @@ class KostController extends Controller
 
         return redirect()->route('owner.dashboard')->with('success', 'Kost berhasil dihapus');
     }
+    public function toggleActive(Kost $kost)
+{
+    // Cek apakah owner yang login adalah pemilik kost ini
+    if ($kost->owner_id !== auth()->guard('owner')->id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $kost->update([
+        'is_active' => !$kost->is_active
+    ]);
+
+    $status = $kost->is_active ? 'diaktifkan' : 'dinonaktifkan';
+    return redirect()->route('owner.dashboard')->with('success', "Kost berhasil {$status}");
+}
 }

@@ -8,13 +8,6 @@
         <h2><i class="bi bi-speedometer2"></i> Dashboard Owner</h2>
     </div>
 
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
     <!-- Owner Actions -->
     <div class="owner-actions">
         <div class="row g-3">
@@ -83,9 +76,24 @@
                     <div class="price-tag mb-3">
                         Rp {{ number_format($kost->price, 0, ',', '.') }}/bulan
                     </div>
-                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editModal{{ $kost->id }}">
-                        <i class="bi bi-pencil-square"></i> Edit Kost
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editModal{{ $kost->id }}">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </button>
+                        <form action="{{ route('kost.toggle', $kost) }}" method="POST" class="flex-fill">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-{{ $kost->is_active ? 'success' : 'secondary' }} w-100" title="{{ $kost->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                <i class="bi bi-{{ $kost->is_active ? 'check-circle' : 'x-circle' }}"></i>
+                                {{ $kost->is_active ? 'Aktif' : 'Nonaktif' }}
+                            </button>
+                        </form>
+                    </div>
+                    @if(!$kost->is_active)
+                    <div class="alert alert-warning mt-2 mb-0 py-1 px-2 small">
+                        <i class="bi bi-exclamation-triangle"></i> Kost tidak tampil di publik
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

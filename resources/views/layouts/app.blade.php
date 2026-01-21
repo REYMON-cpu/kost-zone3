@@ -180,6 +180,59 @@
 
     <!-- Main Content -->
     <main>
+        <div class="container mt-3">
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            
+            @if(session('info'))
+            <div class="alert alert-info alert-dismissible fade show">
+                <i class="bi bi-info-circle"></i> {{ session('info') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            
+            @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Terjadi kesalahan:</strong>
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            
+            @auth('owner')
+                @if(!auth()->guard('owner')->user()->hasVerifiedEmail())
+                <div class="alert alert-warning alert-dismissible fade show">
+                    <i class="bi bi-envelope-exclamation"></i>
+                    <strong>Email belum diverifikasi!</strong> 
+                    Silakan cek inbox email Anda untuk verifikasi.
+                    <form action="{{ route('verification.resend') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="email" value="{{ auth()->guard('owner')->user()->email }}">
+                        <button type="submit" class="btn btn-sm btn-warning ms-2">
+                            <i class="bi bi-send"></i> Kirim Ulang Email
+                        </button>
+                    </form>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+            @endauth
+        </div>
+        
         @yield('content')
     </main>
 
