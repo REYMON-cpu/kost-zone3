@@ -9,7 +9,9 @@ class HomeController extends Controller
 {
     public function index(Request $request)
 {
-    $query = Kost::where('is_active', true); // Hanya tampilkan yang aktif
+    // Hanya tampilkan kost yang aktif DAN sudah diapprove
+    $query = Kost::where('is_active', true)
+                 ->where('approval_status', 'approved');
 
     if ($request->filled('location')) {
         $query->where('location', 'like', '%' . $request->location . '%');

@@ -47,8 +47,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Authenticated routes
     Route::middleware('auth:admin')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        // Kelola Owner
         Route::get('/owners', [App\Http\Controllers\Admin\AdminOwnerController::class, 'index'])->name('owners');
         Route::get('/owners/{owner}', [App\Http\Controllers\Admin\AdminOwnerController::class, 'show'])->name('owners.show');
+        Route::delete('/owners/{owner}', [App\Http\Controllers\Admin\AdminOwnerManagementController::class, 'destroy'])->name('owners.destroy');
+        
+        // Kelola Kost & Approval
+        Route::get('/kosts', [App\Http\Controllers\Admin\AdminKostController::class, 'index'])->name('kosts');
+        Route::get('/kosts/{kost}', [App\Http\Controllers\Admin\AdminKostController::class, 'show'])->name('kosts.show');
+        Route::patch('/kosts/{kost}/approve', [App\Http\Controllers\Admin\AdminKostController::class, 'approve'])->name('kosts.approve');
+        Route::patch('/kosts/{kost}/reject', [App\Http\Controllers\Admin\AdminKostController::class, 'reject'])->name('kosts.reject');
+        Route::delete('/kosts/{kost}', [App\Http\Controllers\Admin\AdminKostController::class, 'destroy'])->name('kosts.destroy');
+        
         Route::post('/logout', [App\Http\Controllers\Admin\AdminAuthController::class, 'logout'])->name('logout');
     });
 });

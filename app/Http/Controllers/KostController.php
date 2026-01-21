@@ -11,48 +11,49 @@ class KostController extends Controller
     
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'location' => 'required|string',
-            'google_maps_link' => 'nullable|url',
-            'type' => 'required|in:Putra,Putri,Campuran',
-            'max_occupants' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'facilities' => 'required|string',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'contact_whatsapp' => 'nullable|string',
-            'contact_instagram' => 'nullable|string',
-            'contact_facebook' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'location' => 'required|string',
+        'google_maps_link' => 'nullable|url',
+        'type' => 'required|in:Putra,Putri,Campuran',
+        'max_occupants' => 'required|integer|min:1',
+        'price' => 'required|numeric|min:0',
+        'facilities' => 'required|string',
+        'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+        'contact_whatsapp' => 'nullable|string',
+        'contact_instagram' => 'nullable|string',
+        'contact_facebook' => 'nullable|string',
+    ]);
 
-        $images = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('kost-images', 'public');
-                $images[] = $path;
-            }
+    $images = [];
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $path = $image->store('kost-images', 'public');
+            $images[] = $path;
         }
-
-        Kost::create([
-            'owner_id' => auth()->guard('owner')->id(),
-            'name' => $request->name,
-            'description' => $request->description,
-            'location' => $request->location,
-            'google_maps_link' => $request->google_maps_link,
-            'type' => $request->type,
-            'max_occupants' => $request->max_occupants,
-            'price' => $request->price,
-            'facilities' => $request->facilities,
-            'images' => $images,
-            'contact_whatsapp' => $request->contact_whatsapp,
-            'contact_instagram' => $request->contact_instagram,
-            'contact_facebook' => $request->contact_facebook,
-        ]);
-
-        return redirect()->route('owner.dashboard')->with('success', 'Kost berhasil ditambahkan');
     }
+
+    Kost::create([
+        'owner_id' => auth()->guard('owner')->id(),
+        'name' => $request->name,
+        'description' => $request->description,
+        'location' => $request->location,
+        'google_maps_link' => $request->google_maps_link,
+        'type' => $request->type,
+        'max_occupants' => $request->max_occupants,
+        'price' => $request->price,
+        'facilities' => $request->facilities,
+        'images' => $images,
+        'approval_status' => 'pending', // Otomatis pending
+        'contact_whatsapp' => $request->contact_whatsapp,
+        'contact_instagram' => $request->contact_instagram,
+        'contact_facebook' => $request->contact_facebook,
+    ]);
+
+    return redirect()->route('owner.dashboard')->with('success', 'Kost berhasil ditambahkan dan menunggu persetujuan admin');
+}
 
     public function update(Request $request, Kost $kost)
 {

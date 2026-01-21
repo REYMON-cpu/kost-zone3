@@ -44,14 +44,14 @@
         <div class="stat-card warning">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stat-label">Total Pengunjung</div>
-                    <div class="stat-value">{{ number_format($stats['total_page_views']) }}</div>
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-value">{{ $stats['pending_kosts'] }}</div>
                     <small class="text-muted">
-                        <i class="bi bi-person"></i> {{ number_format($stats['unique_visitors']) }} Unik
+                        <i class="bi bi-check-circle"></i> {{ $stats['approved_kosts'] }} Approved
                     </small>
                 </div>
                 <div class="stat-icon">
-                    <i class="bi bi-eye-fill"></i>
+                    <i class="bi bi-clock-fill"></i>
                 </div>
             </div>
         </div>

@@ -76,11 +76,54 @@
                         <small class="text-muted">{{ $owner->created_at->diffForHumans() }}</small>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.owners.show', $owner) }}" class="btn btn-sm btn-info" title="Detail">
-                            <i class="bi bi-eye"></i>
-                        </a>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ route('admin.owners.show', $owner) }}" class="btn btn-info" title="Detail">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteOwnerModal{{ $owner->id }}" title="Hapus">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
+
+                <!-- Modal Hapus Owner -->
+                <div class="modal fade" id="deleteOwnerModal{{ $owner->id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-exclamation-triangle"></i> Hapus Owner Paksa
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-3">
+                                    <i class="bi bi-person-x text-danger" style="font-size: 4rem;"></i>
+                                </div>
+                                <h5 class="text-center">Yakin hapus owner ini?</h5>
+                                <div class="alert alert-danger mt-3">
+                                    <strong>Owner:</strong> {{ $owner->name }}<br>
+                                    <strong>Email:</strong> {{ $owner->email }}<br>
+                                    <strong>Jumlah Kost:</strong> {{ $owner->kosts_count }} kost
+                                </div>
+                                <p class="text-danger text-center">
+                                    <strong>⚠️ PERINGATAN:</strong> Semua kost milik owner ini juga akan dihapus! Tindakan ini tidak dapat dibatalkan!
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <form action="{{ route('admin.owners.destroy', $owner) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash"></i> Ya, Hapus Owner
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 @empty
                 <tr>
                     <td colspan="8" class="text-center py-5">

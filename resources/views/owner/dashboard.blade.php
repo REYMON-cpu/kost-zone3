@@ -54,6 +54,22 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ $kost->name }}</h5>
+                    
+                    <!-- Status Approval -->
+                    @if($kost->approval_status == 'pending')
+                        <div class="alert alert-warning py-2 px-2 small mb-2">
+                            <i class="bi bi-clock"></i> Menunggu persetujuan admin
+                        </div>
+                    @elseif($kost->approval_status == 'rejected')
+                        <div class="alert alert-danger py-2 px-2 small mb-2">
+                            <i class="bi bi-x-circle"></i> Ditolak: {{ Str::limit($kost->rejection_reason, 50) }}
+                        </div>
+                    @else
+                        <div class="alert alert-success py-2 px-2 small mb-2">
+                            <i class="bi bi-check-circle"></i> Disetujui admin
+                        </div>
+                    @endif
+                    
                     <p class="text-muted mb-2">
                         <i class="bi bi-geo-alt"></i> {{ $kost->location }}
                     </p>
@@ -154,9 +170,9 @@
                                         @foreach($kost->images as $index => $image)
                                         <div class="col-md-3" id="imageItem{{ $kost->id }}_{{ $index }}">
                                             <div class="position-relative">
-                                                <img src="{{ asset('storage/' . $image) }}" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;" id="imageThumb{{ $kost->id }}_{{ $index }}">
+                                                <img src="{{ asset('storage/' . $image) }}" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
                                                 <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" 
-                                                    onclick="confirmDeleteImage({{ $kost->id }}, '{{ $image }}', {{ $index }})"
+                                                    onclick="deleteImage({{ $kost->id }}, '{{ $image }}', {{ $index }})"
                                                     title="Hapus foto ini">
                                                     <i class="bi bi-x-lg"></i>
                                                 </button>
@@ -164,9 +180,8 @@
                                         </div>
                                         @endforeach
                                     </div>
-                                    <button type="button" class="btn btn-danger btn-sm mb-2" 
-                                        onclick="confirmDeleteAllImages({{ $kost->id }}, {{ count($kost->images) }})">
-                                        <i class="bi bi-trash"></i> Hapus Semua Foto ({{ count($kost->images) }})
+                                    <button type="button" class="btn btn-danger btn-sm mb-2" onclick="deleteAllImages({{ $kost->id }})">
+                                        <i class="bi bi-trash"></i> Hapus Semua Foto
                                     </button>
                                     @else
                                     <div class="alert alert-info">
@@ -176,12 +191,8 @@
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Upload Foto Baru</label>
-                                    <input type="file" name="images[]" class="form-control" multiple accept="image/jpeg,image/jpg,image/png" id="imageInput{{ $kost->id }}">
-                                    <small class="text-muted">
-                                        <i class="bi bi-info-circle"></i> 
-                                        Format: JPG, JPEG, PNG | Maksimal: 2MB per foto | Upload maksimal 10 foto sekaligus
-                                    </small>
-                                    <div id="imageError{{ $kost->id }}" class="text-danger mt-2" style="display: none;"></div>
+                                    <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                                    <small class="text-muted">Upload foto baru atau biarkan kosong jika tidak ingin mengubah</small>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">WhatsApp</label>
@@ -313,12 +324,8 @@
                         </div>
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Foto Kost</label>
-                            <input type="file" name="images[]" class="form-control" multiple accept="image/jpeg,image/jpg,image/png" id="imageInputAdd">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle"></i> 
-                                Format: JPG, JPEG, PNG | Maksimal: 2MB per foto | Upload maksimal 10 foto sekaligus
-                            </small>
-                            <div id="imageErrorAdd" class="text-danger mt-2" style="display: none;"></div>
+                            <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                            <small class="text-muted">Anda bisa upload beberapa foto sekaligus</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">WhatsApp</label>
@@ -347,82 +354,11 @@
 
 @push('scripts')
 <script>
-// Validasi ukuran dan jumlah file saat upload
-document.addEventListener('DOMContentLoaded', function() {
-    const imageInputs = document.querySelectorAll('[id^="imageInput"]');
-    
-    imageInputs.forEach(input => {
-        input.addEventListener('change', function(e) {
-            const files = e.target.files;
-            const errorDiv = this.nextElementSibling.nextElementSibling;
-            const maxSize = 2 * 1024 * 1024; // 2MB
-            const maxFiles = 10;
-            let errors = [];
-            
-            // Cek jumlah file
-            if (files.length > maxFiles) {
-                errors.push(`Maksimal ${maxFiles} foto sekaligus`);
-            }
-            
-            // Cek ukuran setiap file
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].size > maxSize) {
-                    errors.push(`Foto "${files[i].name}" terlalu besar (max 2MB)`);
-                }
-                
-                // Cek tipe file
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(files[i].type)) {
-                    errors.push(`Foto "${files[i].name}" harus format JPG, JPEG, atau PNG`);
-                }
-            }
-            
-            // Tampilkan error atau sembunyikan
-            if (errors.length > 0) {
-                errorDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + errors.join('<br>');
-                errorDiv.style.display = 'block';
-                this.value = ''; // Reset input
-            } else {
-                errorDiv.style.display = 'none';
-            }
-        });
-    });
-});
-
-// Konfirmasi hapus satu foto dengan SweetAlert2
-function confirmDeleteImage(kostId, imagePath, imageIndex) {
-    const imageUrl = document.getElementById(`imageThumb${kostId}_${imageIndex}`).src;
-    
-    Swal.fire({
-        title: 'Hapus Foto Ini?',
-        html: `<img src="${imageUrl}" style="max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px;">`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="bi bi-trash"></i> Ya, Hapus',
-        cancelButtonText: '<i class="bi bi-x-circle"></i> Batal',
-        customClass: {
-            confirmButton: 'btn btn-danger',
-            cancelButton: 'btn btn-secondary'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            deleteImage(kostId, imagePath, imageIndex);
-        }
-    });
-}
-
 // Fungsi hapus satu foto
 function deleteImage(kostId, imagePath, imageIndex) {
-    // Show loading
-    Swal.fire({
-        title: 'Menghapus foto...',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+    if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
+        return;
+    }
     
     fetch(`/owner/kost/${kostId}/image`, {
         method: 'DELETE',
@@ -445,84 +381,26 @@ function deleteImage(kostId, imagePath, imageIndex) {
             if (data.remaining_images === 0) {
                 const previewContainer = document.getElementById(`imagePreview${kostId}`);
                 if (previewContainer) {
-                    previewContainer.parentElement.innerHTML = `
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Foto Kost Saat Ini</label>
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> Belum ada foto yang diupload
-                            </div>
-                        </div>
-                    `;
+                    previewContainer.innerHTML = '<div class="col-12"><div class="alert alert-info"><i class="bi bi-info-circle"></i> Belum ada foto yang diupload</div></div>';
                 }
             }
             
-            // Success message
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: data.message,
-                timer: 2000,
-                showConfirmButton: false
-            });
+            alert(data.message);
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: data.message
-            });
+            alert('Error: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: 'Terjadi kesalahan saat menghapus foto'
-        });
+        alert('Terjadi kesalahan saat menghapus foto');
     });
 }
 
-// Konfirmasi hapus semua foto dengan SweetAlert2
-function confirmDeleteAllImages(kostId, totalImages) {
-    Swal.fire({
-        title: 'Hapus SEMUA Foto?',
-        html: `
-            <div style="text-align: center;">
-                <i class="bi bi-images text-danger" style="font-size: 4rem;"></i>
-                <p class="mt-3">Anda akan menghapus <strong>${totalImages} foto</strong> sekaligus.</p>
-                <div class="alert alert-danger mt-3">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Perhatian!</strong> Tindakan ini tidak dapat dibatalkan!
-                </div>
-            </div>
-        `,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="bi bi-trash"></i> Ya, Hapus Semua',
-        cancelButtonText: '<i class="bi bi-x-circle"></i> Batal',
-        customClass: {
-            confirmButton: 'btn btn-danger',
-            cancelButton: 'btn btn-secondary'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            deleteAllImages(kostId);
-        }
-    });
-}
-
-// Fungsi hapus semua foto (TIDAK menutup modal edit)
+// Fungsi hapus semua foto
 function deleteAllImages(kostId) {
-    // Show loading
-    Swal.fire({
-        title: 'Menghapus semua foto...',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+    if (!confirm('Apakah Anda yakin ingin menghapus SEMUA foto? Tindakan ini tidak dapat dibatalkan!')) {
+        return;
+    }
     
     fetch(`/owner/kost/${kostId}/images/all`, {
         method: 'DELETE',
@@ -534,42 +412,25 @@ function deleteAllImages(kostId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update tampilan foto di modal edit
+            // Hapus semua foto dari DOM
             const previewContainer = document.getElementById(`imagePreview${kostId}`);
             if (previewContainer) {
-                previewContainer.parentElement.innerHTML = `
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Foto Kost Saat Ini</label>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Belum ada foto yang diupload
-                        </div>
-                    </div>
-                `;
+                previewContainer.innerHTML = '<div class="col-12"><div class="alert alert-info"><i class="bi bi-info-circle"></i> Belum ada foto yang diupload</div></div>';
             }
             
-            // Success message
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: data.message,
-                timer: 2000,
-                showConfirmButton: false
-            });
+            alert(data.message);
+            
+            // Reload halaman setelah 1 detik
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: data.message
-            });
+            alert('Error: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: 'Terjadi kesalahan saat menghapus foto'
-        });
+        alert('Terjadi kesalahan saat menghapus foto');
     });
 }
 </script>

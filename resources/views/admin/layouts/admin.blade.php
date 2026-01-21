@@ -128,6 +128,9 @@
             <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            <a href="{{ route('admin.kosts') }}" class="nav-link {{ request()->routeIs('admin.kosts*') ? 'active' : '' }}">
+                <i class="bi bi-house-check"></i> Kelola & Approval Kost
+            </a>
             <a href="{{ route('admin.owners') }}" class="nav-link {{ request()->routeIs('admin.owners*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Kelola Owner
             </a>
