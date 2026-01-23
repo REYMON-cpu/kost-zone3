@@ -12,9 +12,6 @@
                 <div>
                     <div class="stat-label">Total Owner</div>
                     <div class="stat-value">{{ $stats['total_owners'] }}</div>
-                    <small class="text-success">
-                        <i class="bi bi-check-circle"></i> {{ $stats['verified_owners'] }} Terverifikasi
-                    </small>
                 </div>
                 <div class="stat-icon">
                     <i class="bi bi-people-fill"></i>
@@ -126,7 +123,6 @@
                         <tr>
                             <th>Nama</th>
                             <th>Email</th>
-                            <th>Status</th>
                             <th>Terdaftar</th>
                         </tr>
                     </thead>
@@ -135,13 +131,6 @@
                         <tr>
                             <td>{{ $owner->name }}</td>
                             <td>{{ $owner->email }}</td>
-                            <td>
-                                @if($owner->email_verified_at)
-                                    <span class="badge bg-success">Verified</span>
-                                @else
-                                    <span class="badge bg-warning">Pending</span>
-                                @endif
-                            </td>
                             <td>{{ $owner->created_at->diffForHumans() }}</td>
                         </tr>
                         @empty
