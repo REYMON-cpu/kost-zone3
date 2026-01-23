@@ -280,6 +280,11 @@
                                 <i class="bi bi-person-circle"></i> Login Owner
                             </button>
                         </li>
+                        <li class="nav-item ms-2">
+                            <a href="{{ route('admin.login') }}" class="btn btn-outline-dark">
+                                <i class="bi bi-shield-lock"></i> Admin
+                            </a>
+                        </li>
                     @endauth
                 </ul>
             </div>
