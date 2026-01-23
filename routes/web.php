@@ -14,11 +14,6 @@ Route::middleware('guest:owner')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
-// Email Verification Routes
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
-    ->name('verification.verify');
-Route::post('/email/resend', [AuthController::class, 'resendVerification'])
-    ->name('verification.resend');
 // Logout Route
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

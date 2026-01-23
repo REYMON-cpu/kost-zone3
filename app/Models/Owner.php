@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Owner extends Authenticatable implements MustVerifyEmail
+class Owner extends Authenticatable 
 {
     use HasFactory, Notifiable;
 
@@ -31,8 +31,6 @@ class Owner extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Kost::class);
     }
-    public function sendEmailVerificationNotification()
-{
-    $this->notify(new \App\Notifications\OwnerVerifyEmail);
-}
+    // public function sendEmailVerificationNotification() {}
+    // $this->notify(new \App\Notifications\OwnerVerifyEmail);
 }

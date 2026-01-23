@@ -152,6 +152,10 @@
             .banner-container {
                 height: 250px;
             }
+            .banner-placeholder {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
             
             .filter-bar {
                 padding: 15px;
@@ -326,24 +330,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             @endif
-            
-            @auth('owner')
-                @if(!auth()->guard('owner')->user()->hasVerifiedEmail())
-                <div class="alert alert-warning alert-dismissible fade show">
-                    <i class="bi bi-envelope-exclamation"></i>
-                    <strong>Email belum diverifikasi!</strong> 
-                    Silakan cek inbox email Anda untuk verifikasi.
-                    <form action="{{ route('verification.resend') }}" method="POST" class="d-inline">
-                        @csrf
-                        <input type="hidden" name="email" value="{{ auth()->guard('owner')->user()->email }}">
-                        <button type="submit" class="btn btn-sm btn-warning ms-2">
-                            <i class="bi bi-send"></i> Kirim Ulang Email
-                        </button>
-                    </form>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-            @endauth
         </div>
         
         @yield('content')
