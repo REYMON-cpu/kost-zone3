@@ -46,7 +46,7 @@ class AuthController extends Controller
         // Trigger event untuk kirim email verifikasi
         event(new Registered($owner));
 
-        return redirect()->route('home')->with('success', 'Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
+        return redirect()->route('home')->with('success', 'Registrasi berhasil!');
     }
 
     public function logout()
